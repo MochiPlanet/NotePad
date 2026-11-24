@@ -119,9 +119,27 @@ public final class NotePad {
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.google.note";
 
         /**
-         * The default sort order for this table
+         * The default sort order for this table.
+         * Pinned notes always stay on top, then the most recently modified notes come first.
          */
-        public static final String DEFAULT_SORT_ORDER = "modified DESC";
+        public static final String DEFAULT_SORT_ORDER = "pinned DESC, modified DESC";
+
+        /**
+         * Sort orders offered by the note list. The "pinned" column is always put first so that
+         * pinned notes remain on top no matter which sort order the user picks.
+         */
+        public static final String SORT_MODIFIED_DESC = "pinned DESC, modified DESC";
+        public static final String SORT_MODIFIED_ASC = "pinned DESC, modified ASC";
+        public static final String SORT_TITLE_ASC = "pinned DESC, title COLLATE NOCASE ASC";
+        public static final String SORT_CREATED_DESC = "pinned DESC, created DESC";
+
+        /**
+         * Category values used by the sample application.
+         */
+        public static final String CATEGORY_DEFAULT = "默认";
+        public static final String CATEGORY_WORK = "工作";
+        public static final String CATEGORY_STUDY = "学习";
+        public static final String CATEGORY_LIFE = "生活";
 
         /*
          * Column definitions
@@ -150,5 +168,17 @@ public final class NotePad {
          * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
          */
         public static final String COLUMN_NAME_MODIFICATION_DATE = "modified";
+
+        /**
+         * Column name for the note category (工作 / 学习 / 生活 / 默认)
+         * <P>Type: TEXT</P>
+         */
+        public static final String COLUMN_NAME_CATEGORY = "category";
+
+        /**
+         * Column name that stores whether a note is pinned to the top (1) or not (0)
+         * <P>Type: INTEGER</P>
+         */
+        public static final String COLUMN_NAME_PINNED = "pinned";
     }
 }

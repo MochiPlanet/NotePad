@@ -1,0 +1,50 @@
+NotePad 项目 —— 模拟器运行说明
+================================
+
+问题原因
+--------
+Windows 的 HypervisorPlatform（WHPX）在启动时被 Windows 组件服务回滚：
+CBS 日志显示 Hyper-V 网络驱动 NetSetupAI.dll 缺失（0x8007007e），
+导致“启用虚拟化 → 重启 → 又变回禁用”，所以官方模拟器一直提示
+“Android Emulator hypervisor driver is not installed”。
+
+最终解决办法
+------------
+不使用 WHPX，改用 Android 官方 AEHD 2.2 驱动（Android Emulator
+hypervisor driver）。它不依赖 Hyper-V，正好适合当前系统。
+
+已完成：
+1. 安装官方 AEHD 2.2 驱动：
+   C:\Users\28299\AppData\Local\Android\Sdk\extras\google\Android_Emulator_Hypervisor_Driver
+2. 驱动服务已运行：
+   sc query aehd  →  STATE : 4 RUNNING
+3. 加速检查通过：
+   emulator -accel-check  →  AEHD (version 2.2) is installed and usable.
+4. 模拟器 NotePadAPI23 已启动（窗口标题：Android Emulator - NotePadAPI23:5554）。
+5. NotePad 已安装并正在运行。
+
+现在就可以用
+------------
+Android Studio 的设备下拉框里选择：
+    emulator-5554  (Android SDK built for x86)
+然后点击 Run。
+
+以后重新启动
+------------
+双击桌面「启动NotePad模拟器」，或双击项目里的：
+    D:\AndroidWorkSpace\NotePad\start_emulator.bat
+
+脚本会自动：
+- 启动 NotePadAPI23 模拟器
+- 等待系统启动
+- 安装并打开 NotePad
+
+注意
+----
+1. 不要再启用 Hyper-V，也不要运行 Genymotion / VirtualBox。
+   AEHD 和 Hyper-V 二选一，当前使用 AEHD。
+2. 不要重复运行旧的 enable_hypervisor.ps1（已删除）。
+3. 如果模拟器以后启动失败，先检查：
+   - sc query aehd        （应为 RUNNING）
+   - emulator -accel-check（应显示 AEHD ... usable）
+   - adb devices          （应有 emulator-5554 device）

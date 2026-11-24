@@ -1,43 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2007 The Android Open Source Project
-
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-  
-          http://www.apache.org/licenses/LICENSE-2.0
-  
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-
 <resources>
     <string name="app_name">NotePad</string>
-    <string name="live_folder_name">Notes</string>
 
-    <string name="title_edit_title">Note title:</string>
-    <string name="title_create">New note</string>
-    <string name="title_edit">Edit: %1$s</string>
-    <string name="title_notes_list">Notes</string>
+    <!-- Note list -->
+    <string name="notes_title">我的笔记</string>
+    <string name="count_all_zero">共 0 条笔记</string>
+    <string name="count_all">共 %1$d 条笔记</string>
+    <string name="count_filtered">找到 %1$d 条笔记</string>
+    <string name="search_hint">搜索标题或内容…</string>
+    <string name="action_sort">排序方式</string>
+    <string name="action_export">导出全部笔记</string>
+    <string name="action_clear_search">清空搜索</string>
+    <string name="action_new_note">新建笔记</string>
+    <string name="sort_dialog_title">排序方式</string>
+    <string name="sort_changed">已按「%1$s」排序</string>
 
-    <string name="menu_add">New note</string>
-    <string name="menu_save">Save</string>
-    <string name="menu_delete">Delete</string>
-    <string name="menu_open">Open</string>
-    <string name="menu_revert">Revert changes</string>
-    <string name="menu_copy">Copy</string>
-    <string name="menu_paste">Paste</string>
+    <!-- Empty states -->
+    <string name="empty_notes_title">还没有笔记</string>
+    <string name="empty_notes_hint">点击右下角的 + 记录第一条笔记</string>
+    <string name="empty_search_title">没有找到相关笔记</string>
+    <string name="empty_search_hint">换一个关键词试试，或清空搜索框</string>
+    <string name="empty_category_title">「%1$s」下还没有笔记</string>
+    <string name="empty_category_hint">点击右下角的 + 新建一条</string>
 
-    <string name="button_ok">OK</string>
-    <string name="text_title">Title:</string>
+    <!-- Note row -->
+    <string name="note_untitled">无标题</string>
+    <string name="note_empty_preview">点击编辑此笔记…</string>
 
-    <string name="resolve_edit">Edit note</string>
-    <string name="resolve_title">Edit title</string>
+    <!-- Item actions -->
+    <string name="action_open">打开笔记</string>
+    <string name="action_pin">置顶笔记</string>
+    <string name="action_unpin">取消置顶</string>
+    <string name="action_share">分享笔记</string>
+    <string name="action_delete">删除笔记</string>
+    <string name="action_back">返回</string>
+    <string name="share_note">分享笔记</string>
+    <string name="toast_pinned">已置顶</string>
+    <string name="toast_unpinned">已取消置顶</string>
+    <string name="toast_deleted">笔记已删除</string>
 
-    <string name="error_title">Error</string>
-    <string name="error_message">Error loading note</string>
-    <string name="nothing_to_save">There is nothing to save</string>
+    <!-- Dialogs and buttons -->
+    <string name="delete">删除</string>
+    <string name="cancel">取消</string>
+    <string name="delete_dialog_title">删除笔记</string>
+    <string name="delete_dialog_message">确定要删除「%1$s」吗？删除后无法恢复。</string>
+    <string name="delete_editor_message">确定要删除这篇笔记吗？删除后无法恢复。</string>
+
+    <!-- Editor -->
+    <string name="editor_title_new">新建笔记</string>
+    <string name="editor_title_edit">编辑笔记</string>
+    <string name="editor_time_created">创建于 %1$s</string>
+    <string name="editor_time_modified">修改于 %1$s</string>
+    <string name="hint_title">标题</string>
+    <string name="hint_note">开始记录你的想法…</string>
+    <string name="category_chip">%1$s ▾</string>
+    <string name="category_dialog_title">选择笔记分类</string>
+    <string name="word_count">%1$d 字</string>
+    <string name="toast_saved">笔记已保存</string>
+    <string name="toast_empty_deleted">空笔记未保存</string>
+    <string name="toast_create_failed">新建笔记失败，请重试</string>
+    <string name="toast_note_missing">找不到这篇笔记</string>
+    <string name="toast_unknown_action">无法识别的操作</string>
+
+    <!-- Export -->
+    <string name="toast_nothing_to_export">还没有可以导出的笔记</string>
+    <string name="toast_no_file_manager">系统没有可用的文件选择器</string>
+    <string name="toast_exported">已导出 %1$d 条笔记</string>
+    <string name="toast_export_failed">导出失败：%1$s</string>
 </resources>

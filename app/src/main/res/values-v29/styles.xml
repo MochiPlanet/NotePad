@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Keep our hand-picked light colors even when the system is in dark mode. -->
+    <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

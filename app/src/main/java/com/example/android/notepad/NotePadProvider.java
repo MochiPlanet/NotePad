@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.content.ContentProvider.PipeDataWriter;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -63,7 +62,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     /**
      * The database version
      */
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     /**
      * A projection map used to select columns from the database
@@ -156,6 +155,16 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE);
 
+        // Maps "category" to "category"
+        sNotesProjectionMap.put(
+                NotePad.Notes.COLUMN_NAME_CATEGORY,
+                NotePad.Notes.COLUMN_NAME_CATEGORY);
+
+        // Maps "pinned" to "pinned"
+        sNotesProjectionMap.put(
+                NotePad.Notes.COLUMN_NAME_PINNED,
+                NotePad.Notes.COLUMN_NAME_PINNED);
+
         /*
          * Creates an initializes a projection map for handling Live Folders
          */
@@ -196,29 +205,50 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                    + NotePad.Notes.COLUMN_NAME_TITLE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
-                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER"
+                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER,"
+                   + NotePad.Notes.COLUMN_NAME_CATEGORY + " TEXT DEFAULT '"
+                   + NotePad.Notes.CATEGORY_DEFAULT + "',"
+                   + NotePad.Notes.COLUMN_NAME_PINNED + " INTEGER DEFAULT 0"
                    + ");");
        }
 
        /**
-        *
-        * Demonstrates that the provider must consider what happens when the
-        * underlying datastore is changed. In this sample, the database is upgraded the database
-        * by destroying the existing data.
-        * A real application should upgrade the database in place.
+        * Upgrades the database in place. Unlike the original sample, existing notes are kept:
+        * the two columns added for the extended features are appended with ALTER TABLE.
         */
        @Override
        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+           Log.i(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
 
-           // Logs that the database is being upgraded
-           Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-                   + newVersion + ", which will destroy all old data");
+           if (oldVersion < 3) {
+               addColumnIfMissing(db, NotePad.Notes.COLUMN_NAME_CATEGORY,
+                       "TEXT DEFAULT '" + NotePad.Notes.CATEGORY_DEFAULT + "'");
+               addColumnIfMissing(db, NotePad.Notes.COLUMN_NAME_PINNED,
+                       "INTEGER DEFAULT 0");
+           }
+       }
 
-           // Kills the table and existing data
-           db.execSQL("DROP TABLE IF EXISTS notes");
-
-           // Recreates the database with a new version
-           onCreate(db);
+       /**
+        * Adds a column only if it does not exist yet, so the upgrade can safely run more than once.
+        */
+       private void addColumnIfMissing(SQLiteDatabase db, String column, String type) {
+           boolean exists = false;
+           Cursor cursor = db.rawQuery("PRAGMA table_info(" + NotePad.Notes.TABLE_NAME + ")", null);
+           try {
+               int nameIndex = cursor.getColumnIndex("name");
+               while (cursor.moveToNext()) {
+                   if (column.equals(cursor.getString(nameIndex))) {
+                       exists = true;
+                       break;
+                   }
+               }
+           } finally {
+               cursor.close();
+           }
+           if (!exists) {
+               db.execSQL("ALTER TABLE " + NotePad.Notes.TABLE_NAME
+                       + " ADD COLUMN " + column + " " + type);
+           }
        }
    }
 
@@ -531,13 +561,22 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
         // If the values map doesn't contain a title, sets the value to the default title.
         if (values.containsKey(NotePad.Notes.COLUMN_NAME_TITLE) == false) {
-            Resources r = Resources.getSystem();
-            values.put(NotePad.Notes.COLUMN_NAME_TITLE, r.getString(android.R.string.untitled));
+            values.put(NotePad.Notes.COLUMN_NAME_TITLE, "");
         }
 
         // If the values map doesn't contain note text, sets the value to an empty string.
         if (values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE) == false) {
             values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");
+        }
+
+        // New notes start in the default category unless the caller specifies one.
+        if (values.containsKey(NotePad.Notes.COLUMN_NAME_CATEGORY) == false) {
+            values.put(NotePad.Notes.COLUMN_NAME_CATEGORY, NotePad.Notes.CATEGORY_DEFAULT);
+        }
+
+        // New notes are not pinned by default.
+        if (values.containsKey(NotePad.Notes.COLUMN_NAME_PINNED) == false) {
+            values.put(NotePad.Notes.COLUMN_NAME_PINNED, 0);
         }
 
         // Opens the database object in "write" mode.
@@ -559,6 +598,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
             // Notifies observers registered against this provider that the data changed.
             getContext().getContentResolver().notifyChange(noteUri, null);
+            // Also notify the directory URI so a CursorLoader watching all notes refreshes.
+            getContext().getContentResolver().notifyChange(NotePad.Notes.CONTENT_URI, null);
             return noteUri;
         }
 
@@ -640,6 +681,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
          * and observers that have registered themselves for the provider are notified.
          */
         getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(NotePad.Notes.CONTENT_URI, null);
 
         // Returns the number of rows deleted.
         return count;
@@ -733,6 +775,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
          * and observers that have registered themselves for the provider are notified.
          */
         getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(NotePad.Notes.CONTENT_URI, null);
 
         // Returns the number of rows updated.
         return count;
